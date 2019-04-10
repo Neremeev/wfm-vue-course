@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+
+  <style>
+    .circle {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 1px solid black;
+      display: inline-block;
+      margin: 40px;
+    }
+
+    .red {background: red;}
+    .blue {background: blue;}
+    .green {background: green;}
+  </style>
+
+
+
+</head>
+<body>
+
+<!-- @ вместо v-on или : вместо v-bind-->
+
+<div id="app">
+  <input type="text" v-on:input="changeName">
+  <h1>Hello {{name}}</h1>
+  <a :href="url" target="_blank" @click.prevent="">google</a><!--модификаторы вью-->
+  <h2 v-html="html"></h2>
+</div>
+
+<hr>
+
+<div id="app2">
+  <h2 v-on:mouseover="onHover"> Counter = {{ counter}}</h2>
+  <button v-on:click="riseCounterPlus(2, $event)">+</button>
+  <button v-on:click="counter--">-</button>
+</div>
+
+<hr>
+
+<div id="app3" v-on:mousemove="handleMouseMove">
+  X: {{x}} \ Y: {{y}}
+
+  <span v-on:mousemove.stop="">Не изменять</span>
+</div>
+
+
+<hr>
+
+<!--модификаторы клавиатуры-->
+<div id="lesson4">
+  <input type="text" v-on:keyup.enter.space="alertValue"><!--по нажатию ентер или пробел-->
+</div>
+
+<hr>
+<div id="lesson9">
+  <input type="text" v-model.lazy="inputValue"><!--lazy убираем фокус с инпута - модель меняется-->
+
+  <h2> {{inputValue}} </h2>
+</div>
+
+<hr>
+<div id="lesson10css">
+  <div
+      class="circle"
+      @click="isActive = !isActive"
+      :class="getCssClasses"
+  ></div>
+
+  <div class="circle" :class="[color, {'red': isActive}]"></div><!--по приоритетам внутри класса-->
+
+  <input type="text" v-model="color">
+
+  <hr>
+
+  <div class="circle" :style="circleClasses"></div>
+  <div class="circle" :style="[circleClasses, {'width': height + 'px'}]"></div>
+  <input type="text" v-model="color2">
+  <input type="text" v-model="height">
+
+
+</div>
+
+
+<hr>
+<!--разница между v-if и v-show v-if стирает из дом дерева-->
+<div id="lesson12v-if">
+  <template v-if="isVisible">
+    <h2>I am title</h2>
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus, voluptas.</p>
+  </template>
+
+  <template v-else>
+    <h2 style="color: red">I am title</h2>
+    <p style="color: blue">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus, voluptas.</p>
+  </template>
+</div>
+
+
+<hr>
+<div id="lesson14for">
+  <ul>
+    <li v-for="(person, index) of people">{{ index + 1 }}. {{ person.name }} - <b>{{ person.age }}</b></li>
+  </ul>
+
+  <hr>
+
+  <ol>
+    <li v-for="num of 4">{{ num }}</li>
+  </ol>
+
+  <hr>
+
+  <ul>
+    <li v-for="(value, key, index) in person"><em>{{ index + 1 }}</em> <b>{{ key }}</b> {{ value }}</li>
+  </ul>
+</div>
+
+<hr>
+
+
+<hr>
+<div id="lesson15computed">
+  <h2>Counter {{ counter }} \ {{ counter2 }}</h2>
+  <h3>Result: {{ result() }}</h3>
+  <h3>Computed result: {{ computedResult }}</h3>
+
+  <button @click="add">Add</button>
+  <button @click="sub">Sub</button>
+  <button @click="counter2++">Add counter 2</button>
+</div>
+
+<hr>
+<div id="lesson17net1">
+  <h2>{{ title }}</h2>
+  <h3>{{ newField }}</h3>
+  <button @click="title = 'Updated title'">Update title</button>
+</div>
+<hr>
+<div id="lesson17net2">
+  <h2>{{ title }}</h2>
+  <button @click="updateFirstTitle">Update first title</button>
+</div>
+
+<hr>
+<div id="lesson18ref">
+  <h2 ref="heading">{{ title }}</h2>
+  <button @click="updateFirstTitle">Update title</button>
+
+  <hr ref="horLine">
+</div>
+
+<hr>
+<div id="lesson19other"></div>
+
+
+<hr>
+<div id="lesson10lifeCycle">
+  <h2>{{ title }}</h2>
+
+  <button @click="title = 'Changed title'">Change</button>
+  <button @click="doDestroy">Destroy</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+<script>
+
+
+  new Vue({
+      el: '#app',
+      data: {
+          name: 'Vue',
+          url: 'http://google.com',
+          html: '<a href="http://google.com" target="_blank">Google</a>'
+      },
+      methods: {
+          changeName: function (event) {
+              this.name = event.target.value
+          },
+          clickOnGoogle: function (event) {
+              // останавливаем событие
+              //event.preventDefault();
+          }
+      }
+  });
+
+    new Vue({
+        el: '#app2',
+        data: {
+            counter: 0
+        },
+        methods: {
+            riseCounterPlus: function (num, event) {
+                this.counter += num;
+                console.log(event)
+            },
+            onHover: function (event) {
+              event.target.style.color = 'red';
+            }
+        }
+    });
+
+    new Vue({
+        el: '#app3',
+        data: {
+            x: 0,
+            y: 0
+        },
+        methods: {
+          handleMouseMove: function () {
+              this.x = event.clientX;
+              this.y = event.clientY;
+          }
+        }
+    });
+
+  new Vue({
+      el: '#lesson4',
+      data: {
+
+      },
+      methods: {
+        alertValue: function (event) {
+            if (event.keyCode === 13) {
+                console.log(event.target.value)
+            }
+        }
+      }
+  });
+
+  new Vue({
+      el: '#lesson9',
+      data: {
+        inputValue: "value"
+      },
+      methods: {
+      }
+  }),
+
+  new Vue({
+      el: '#lesson10css',
+      data: {
+          isActive: false,
+          color: 'blue',
+          color2: 'blue',
+          height: 100
+      },
+      // чтобы метод постоянно не вызывался
+      computed: {
+          getCssClasses: function() {
+              return {
+                  'red': this.isActive,
+                  'green': !this.isActive
+              }
+          },
+          circleClasses: function() {
+              return {
+                  'background': this.color2,
+                  'height': this.height + 'px'
+              }
+          }
+      },
+      methods: {
+
+      }
+  });
+
+
+  new Vue({
+      el: '#lesson12v-if',
+      data: {
+          isVisible: false
+      }
+  });
+
+  new Vue({
+      el: '#lesson14for',
+      data: {
+          people: [
+              {name: 'Vlad', age: 20},
+              {name: 'Max', age: 25},
+              {name: 'Elena', age: 30}
+          ],
+          person: {
+              name: 'Max',
+              age: 50,
+              job: 'Frontend'
+          }
+      }
+  })
+
+  new Vue({
+      el: '#lesson15computed',
+      data: {
+          counter: 0,
+          counter2: 0
+      },
+      methods: {
+          add: function() {
+              this.counter++
+          },
+          sub: function() {
+              this.counter--
+          },
+          result: function() {
+              console.log('Result was called')
+              return this.counter > 3 ? 'More than 3' : 'Less than 3'
+          }
+      },
+      // computed вызываетя только, если изменяются переменные внутри него (оптимизация)
+      // methods вызывается при любом изменении
+      computed: {
+          computedResult: function() {
+              console.log('Computed result was called')
+              return this.counter > 3 ? 'More than 3' : 'Less than 3'
+          }
+      },
+      watch: {
+          //вызывается при изменении переменной
+          counter: function(val) {
+              console.log('From watch object', val)
+          }
+      }
+  })
+
+  var vue1 = new Vue({
+      el: '#lesson17net1',
+      data: {
+          title: 'Hello I am Vue!'
+      },
+      methods: {
+          alertFast: function () {
+              alert('I am from vue 1')
+          }
+      }
+  })
+
+  console.log(vue1)
+
+  vue1.newField = 'Random text'
+
+  new Vue({
+      el: '#lesson17net2',
+      data: {
+          title: 'Hello from Vue 2'
+      },
+      methods: {
+          updateFirstTitle: function() {
+              vue1.title = 'Updated from second app'
+              vue1.newField = 'New newField!'
+
+              setTimeout(function(){
+                  vue1.alertFast()
+              },1000)
+          }
+      }
+  })
+
+
+  new Vue({
+      el: '#lesson18ref',
+      data: {
+          title: 'Hello I am Vue!'
+      },
+      methods: {
+          updateFirstTitle() {
+              this.title = 'New title!'
+              console.log(this.$refs)
+          }
+      }
+  })
+
+  var vue19 = new Vue({
+      data: {
+          title: 'Hello I am Vue! 2'
+      },
+      template: '<div><h1>{{ title }}</h1><p>Hello p</p></div>'
+  });
+
+  vue19.$mount('#lesson19other')
+
+
+  new Vue({
+      el: '#lesson10lifeCycle',
+      data: {
+          title: 'Hello I am Vue!'
+      },
+      methods: {
+          doDestroy: function() {
+              this.$destroy()
+          }
+      },
+      beforeCreate: function() {
+          console.log('Before Create')
+      },
+      created: function() {
+          console.log('Created')
+      },
+      beforeMount: function() {
+          console.log('Before Mount')
+      },
+      mounted: function() {
+          console.log('Mounted')
+      },
+      beforeUpdate: function() {
+          console.log('Before Update')
+      },
+      updated: function() {
+          console.log('Updated')
+      },
+      beforeDestroy: function() {
+          console.log('Before Destroy')
+      },
+      destroyed: function() {
+          console.log('Destroyed')
+      }
+  })
+
+
+</script>
+</body>
+</html>
