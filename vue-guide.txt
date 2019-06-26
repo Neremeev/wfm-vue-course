@@ -1,0 +1,375 @@
+vue js
+
+1) :input="method"
+
+methods: {
+	method: function(event) {
+		console.log(event.target.value)
+	}
+}
+	
+2) в скобках можно писать логику {{'' ? '' : ''}}
+
+3) динамические атрибуты переменные v-bind:href="url"
+
+4) вывод html <h2 v-html="link"></h2>
+
+5) если мы передаем нативный елемент в функцию - то передаем в артибуте так :click="method($event)"
+
+6) модификаторы v-on:click.prevent https://metanit.com/web/vuejs/3.5.php (модификаторы можно объединять - чейнинг)
+
+7) события клавиатуры v-on:keyup.enter.space="method" (отправка на энтер и таб) на документации можно посмотреть все
+
+8) ярлыки директив v-bind = :  v-on = @
+
+9) value="123" (изначальное значение в инпуте)
+
+10) <input v-model="inputValue"> - двустороннее связывание
+
+11) стилизация динамическая :class="{'first': value, 'second': !value}" или :class="value" и там уже в js задавать
+можно так :class="[color {'red': value}]" можно возвращать методом :class="getClass"
+
+12) computed отличаестя от methods отпимизацией - его лучше использовать
+
+13) стилизация динамическая :style="{'background': value, ...}" и тоже самое что в п.11
+
+14) <h2 v-if="a === value"/> <h2 v-else-if="b === value"/> <div v-else/>
+
+15) v-show и v-if (v-if убирается с дом дерева)
+
+16) <li v-for="(person, index) in people"/>
+<li v-for="num of 10"/> - выводятся 10 элементов
+<li v-for="(value, key, index) in person"/> - {} выведутся параметры объекта + key ключи
+
+17) computed - вызывается только тогда, когда в методе есть зависящие переменные
+methods = m() computed = m
+
+18) watch: {
+		counter: function() {
+			при любом изменении переменной counter выполняем логику
+		}
+	}
+	
+19) из приложения в приложения можно обращаться так vue.value = "sadasda"
+
+20) <input ref="value"/> доступ к дом элементам this.$refs.value
+
+21) в свойствах vue объекта мы можем прописать template и html писать там
+
+22) <v-for и v-if нельзя ставить в один ряд так как v-for приоритетнее
+
+23) жизненные циклы
+- beforeCreate: function() {} - прошла инициализация и приложение готовится к созданию
+- created - на этом этапе приложение создано
+- beforeMount - приложению готовится вставить шаблон в дом дерево
+- mounted - приложение вмонтировано в дом
+- beforeUpdate - перед тем как что то изменилось
+- updated - изменилось
+- beforeDestroy - перед уничтожением компонента
+- destroyed - компонент уничтожен (this,$destroy() - системный метод уничтожения компонента)
+
+24) локальная регистрация компонентов в поле объекта vue components названия могут равнятся myApp = <my-app> + деструктуризация
+
+25) передача параметров компоненту в props сверху <app :car="car2"> props: ['car']
+
+26) валидация входящих параметров props: {car: { type: string, required: true, default: '123' }, ...}
+
+27) передача параметров от дочернего this.$emit('change', this.car) и передаем наверх изменение а в верху <app @change="car = $event"
+
+28) передача функции как параметра <app :changeFunc="changeCar" prop: {changeFunc: function} и там вызываем ее
+
+29) связь дочерних компонентов а) передаем сначала наверх, а потом вниз другому б) Шина событий 
+export const eventEmitter = new Vue() - перед приложением
+в компоненте импортим его и пишем eventEmitter.$emit('counterUpdated') eventEmitter.$on как broadcast в ангуляре 1
+
+30) все стили которые задаются в компоненте - глобальны, использование <style scoped> делает стиль локальным
+
+31) передача html компоненту <app><h2>asdasd</h2></app>  внутри компонента используем <slot></slot>
+
+32) своя директива експортим директиву перед приложением Vue.directive('colored', colorDirective) <h2 v-colored:background.font="color"></h2>
+директива:
+export default {
+	bind(el, bindings, vnode) { el - элемент, bindings - значения, переданные в директиву (read only), vnode - вирт. дом (read only)
+		вызывается при инициализации директивы
+		const argument = bindings.arg
+		el.style.[argument] = bindings.value
+		
+		const font = bindings.modifiers['font']
+		
+		if (font) {
+			...
+		}
+	},
+	inserted(el, bindings, vnode) {
+		после инициализации
+	},
+	update(el, bindings, vnode, oldVnode) {
+		что то изменилось в дом дереве, обновились родительские элементы
+	},
+	componentUpdated(el, bindings, vnode, oldVnode) {
+		обновились дочерние элементы
+	},
+	unbind() {
+		при уничтожении элемента
+	}
+}
+локальная регистрация директивы: поле компонента directives
+
+33) фильтры как пайпы в ангуляре региcтрация локальная в поле компонента filters <h2>{{title | lowerCase}}</h2>
+filters: {
+	lowerCase(value) {
+		return value.toLowerCase()
+	}
+}
+глобальная регистрация перед инициализацией приложения
+
+34) фильтрация списков:  <li v-for="name of filteredNames">
+computed: {
+	filteredNames() { - не filter потому что оптимизированее и вызывается при изменении этих переменных
+		return this.names.filter(name => {
+			return name.indexOf(this.searchName) !== -1
+		})
+	}
+}
+
+35) миксины  (нужно когда в компонентах есть одинаковая логика)
+в компонент импортим миксиин и регистрируем mixins:[List mixin]
+export default {
+  data () {
+    return {
+      searchName: '',
+      names: ['Vlad', 'Max', 'Elena', 'Igor']
+    }
+  },
+  computed: {
+    filteredNames() {
+      return this.names.filter(name => {
+        return name.toLowerCase().indexOf(this.searchName.toLowerCase()) !== -1
+      })
+    }
+  },
+  created() {
+    console.log('created')
+  }
+}
+глобальная регистрация перед инициализацией компонента - миксин будет применен ко всем компонентам
+
+36) тектовый инпут
+<input type="text" v-model.lazy="name">
+name: 'Initial state'
+
+  
+37) Текстареа <textarea v-model="textarea"></textarea>
+textarea: 'I am initial text'
+
+38) чекбоксы
+<label>
+  <input type="checkbox" value="instagram" v-model="social"> Instagram
+</label>
+
+<label>
+  <input type="checkbox" value="vk" v-model="social"> Vk
+</label>
+
+<label>
+  <input type="checkbox" value="facebook" v-model="social"> Facebook
+</label>
+social: ['vk'] - добавляет в массив выбранные чекбоксы
+
+39) радиокнопки
+<label>
+  <input type="radio" value="instagram" v-model="social"> Instagram
+</label>
+
+<label>
+  <input type="radio" value="vk" v-model="social"> Vk
+</label>
+
+<label>
+  <input type="radio" value="facebook" v-model="social"> Facebook
+</label>
+social: 'facebook'
+
+40) селекты
+<select v-model="social">
+  <option
+    v-for="s in socialsList"
+  >{{ s }}</option>
+</select>
+defaultSocial: 'vk',
+social: 'instagram',
+socialsList: ['instagram', 'vk', 'facebook']
+
+41) модификатор v-model.number - приводит значение к числу
+
+42) создание своего контрола
+<app-onoff v-model="switched"></app-onoff>
+switched: true
+onChange (newValue) {
+	this.$emit('input', newValue) - инпут зарезервированное название
+}
+
+43) валидация форм устанавливаем vuelidate
+импортировать бибилиотеку и подключить
+Vue.use(Vuelidate)
+
+44) валидаторы
+
+<form class="pt-3" @submit.prevent="onSubmit">
+
+    <input
+      type="email"
+      id="email"
+      class="form-control"
+      :class="{'is-invalid': $v.email.$error}"
+      @blur="$v.email.$touch()"
+      v-model="email"
+    >
+    <div class="invalid-feedback" v-if="!$v.email.required">Email field is required</div>
+    <div class="invalid-feedback" v-if="!$v.email.email">This field should be an email</div>
+    <div class="invalid-feedback" v-if="!$v.email.uniqEmail">This email is already exists</div>
+
+
+    <input
+      type="password"
+      id="password"
+      class="form-control"
+      :class="{'is-invalid': $v.password.$error}"
+      @blur="$v.password.$touch()"
+      v-model="password"
+    >
+    <div class="invalid-feedback" v-if="!$v.password.minLength">
+      Min length of password is {{ $v.password.$params.minLength.min }}. Now it is {{ password.length }}.
+    </div>
+
+    <label for="confirm">Confirm password</label>
+    <input
+      type="password"
+      id="confirm"
+      class="form-control"
+      :class="{'is-invalid': $v.confirmPassword.$error}"
+      @blur="$v.confirmPassword.$touch()"
+      v-model="confirmPassword"
+    >
+    <div class="invalid-feedback" v-if="!$v.confirmPassword.sameAs">
+      Passwords should match
+    </div>
+
+  <button
+    class="btn btn-success"
+    type="submit"
+    :disabled="$v.$invalid"
+  >Submit</button>
+</form>
+
+validations: {
+	email: {
+	  required,
+	  email,
+	  uniqEmail: function(newEmail) {
+	    if (newEmail === '') return true
+
+		// просто имитируем поход на бэк
+	    return new Promise((resolve, reject) => {
+	      setTimeout(() => {
+	        const value = newEmail !== 'test@mail.ru'
+	        resolve(value)
+	      }, 1000)
+	    })
+	  }
+	},
+	password: {
+	  minLength: minLength(6)
+	},
+	confirmPassword: {
+	  sameAs: sameAs('password')
+	}
+},
+methods: {
+	onSubmit () {
+	  console.log('Email', this.email)
+	  console.log('Password', this.password)
+	}
+}
+
+45) Роутинг устанавливаем vue-routing см.блок 9 - ленивая загрузка, якоря и хэшы, гварды!!!, передача и прием параметров
+
+46) работа с vue-resourse
+Vue.use(VueResource)
+// baseUrl
+Vue.http.options.root = 'http://localhost:3000/'
+
+// this.$http.post('http://localhost:3000/cars', car)
+this.resource.save({}, car)
+
+// this.$http.get('http://localhost:3000/cars')
+this.resource.get().then(response => response.json())
+  .then(cars => this.cars = cars)
+
+// при создании компонента
+created () {
+  this.resource = this.$resource('cars')
+}
+
+47) интерсепторы обрабатывают запросы, уходящие на сервер (можно изменять хэдеры, изменять метод и тд)
+Vue.http.interceptors.push(request => {
+  request.headers.set('Auth', 'RAND TOKEN ' + Math.random()) // добавили хэдер Auth и значение токена к нему
+})
+
+48) Vuex
+
+// импорт стор
+import store from './store'
+new Vue({
+  el: '#app',
+  store,
+  render: h => h(App)
+})
+
+// сам стор index.js
+import Vue from 'vue'
+import Vuex from 'vuex'
+import counter from './counter' - state counter
+
+Vue.use(Vuex)
+export default new Vuex.Store({
+  modules: { - экпортируем модули стейта
+    counter
+  },
+  state: {
+    title: 'Hello from store' 
+  },
+  getters: { - выводим логику для модификации стейта: то есть фильтры и тд lowerCase
+    title (state) {
+      return state.title + '!!!'
+    }
+  }
+})
+
+получение
+computed: {
+  title () {
+    return this.$store.getters.title или this.$store.state.title
+  }
+}
+
+
+mutations: {
+	changeCounter (state, payload) { - нужны для изменения стейта, вызов this.$store.commit
+	  state.counter += payload
+	}
+},
+actions: {
+	asyncChangeCounter ({commit}, payload) { - нужны для логики и асинхронных действий вызов this.$store.dispatch('asyncChangeCounter' {...})
+	  setTimeout(() => {
+	    commit('changeCounter', payload.counterValue)
+	  }, payload.timeoutDelay)
+	}
+}
+
+
+
+
+
+
+ 
